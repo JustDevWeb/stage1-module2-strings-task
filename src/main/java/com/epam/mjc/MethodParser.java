@@ -1,5 +1,10 @@
 package com.epam.mjc;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 public class MethodParser {
 
     /**
@@ -20,6 +25,58 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        throw new UnsupportedOperationException("You should implement this method.");
+        String methodName;
+        String accessModifier = null;
+        String returnType;
+        List<MethodSignature.Argument> arguments;
+        try {
+            StringTokenizer st = new StringTokenizer(signatureString, "()");
+            ArrayList<String> signatures = new ArrayList<>();
+            ArrayList<String> parameters = new ArrayList<>();
+
+            for (int i = 0; i <= st.countTokens() && st.hasMoreTokens(); i++) {
+                String delim = i < 1 ? " " : ",";
+                StringTokenizer parts = new StringTokenizer(st.nextToken(), delim);
+
+                if (i < 1) {
+                    while (parts.hasMoreTokens()) {
+                        signatures.add(parts.nextToken());
+                    }
+                } else {
+                    while (parts.hasMoreTokens()) {
+                        parameters.add(parts.nextToken().trim());
+                    }
+                }
+            }
+
+            if (signatures.size() > 2) {
+                accessModifier = signatures.get(0);
+                returnType = signatures.get(1);
+                methodName = signatures.get(2);
+            } else {
+                returnType = signatures.get(0);
+                methodName = signatures.get(1);
+            }
+            arguments = makeArguments(parameters);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("You should implement this method.");
+        }
+
+        MethodSignature ms = new MethodSignature(methodName,arguments);
+        ms.setAccessModifier(accessModifier);
+        ms.setReturnType(returnType);
+
+        return ms;
+    }
+
+    private List<MethodSignature.Argument> makeArguments (ArrayList<String> arguments) {
+        List<MethodSignature.Argument> listArguments = new ArrayList<>() ;
+
+        for( String arg : arguments) {
+            String[] argArray = arg.split(" ");
+            MethodSignature.Argument argObject = new MethodSignature.Argument(argArray[0],argArray[1]);
+            listArguments.add(argObject);
+        }
+        return  listArguments;
     }
 }
